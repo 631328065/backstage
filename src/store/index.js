@@ -4,12 +4,11 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
-  modules: {
-  }
+    state: {
+        leftWidth: "200px",
+        title: '商品列表'
+    },
+    mutations: {},
+    actions: {},
+    modules: {}
 })
