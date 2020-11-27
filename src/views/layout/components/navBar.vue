@@ -1,11 +1,11 @@
 <template>
   <div class="nav-box">
-    <i class="el-icon-s-fold" @click="openMenu" :style="{ transform: rotateZ }"></i>
+    <i class="el-icon-s-fold"></i>
     <template v-for="(e, i) in titleArr">
       <router-link :to="e.path" :key="i">
         <span class="s1">{{ e.title }}</span>
       </router-link>
-      <span class="s2">/</span>
+      <span>/</span>
     </template>
     <span class="s3">{{ this.$store.state.title }}</span>
     <div class="nav-log">
@@ -39,21 +39,12 @@ export default {
     });
   },
   methods: {
-    openMenu() {
-      if (this.isOpen) {
-        this.$store.state.leftWidth = "50px";
-        this.rotateZ = "rotateZ(90deg)";
-        this.isOpen = 0;
-      } else {
-        this.$store.state.leftWidth = "200px";
-        this.rotateZ = "rotateZ(0deg)";
-        this.isOpen = 1;
-      }
-    },
     navCallBack(command) {
       if (command == "outUser") {
         Cookies.remove("loginToken");
         this.$router.push("/login");
+      } else {
+        this.$router.push("/home");
       }
     },
   },

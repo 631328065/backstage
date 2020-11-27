@@ -1,5 +1,5 @@
 <template>
-  <div class="left-box" :style="{ width: this.$store.state.leftWidth }">
+  <div class="left-box">
     <el-menu default-active="0" class="el-menu-vertical-demo" background-color="#294256" text-color="#a7cbd9" active-text-color="#3b9edf">
       <el-menu-item index="0" @click="openHome">
         <i class="el-icon-s-home"></i>
@@ -27,6 +27,7 @@ export default {
   data() {
     return {
       routerData: [],
+      isCollapse: false,
     };
   },
   mounted() {
@@ -59,6 +60,7 @@ export default {
 
 <style lang="scss">
 .left-box {
+  width: 200px;
   height: 100vh;
 }
 .menus-list {

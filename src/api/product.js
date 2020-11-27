@@ -1,11 +1,12 @@
 import Service from '@/util/request.js';
 
 //商品列表
-export function getProductList() {
+export function getProductList(form) {
     // Service()
     return Service({
         method: "GET",
-        url: "/product/list?pageNum=1&pageSize=5"
+        url: "/product/list",
+        params: form
     });
 }
 
@@ -30,6 +31,14 @@ export function productNewStatus(params) {
 export function productRecommendStatus(params) {
     return Service({
         url: "/product/update/recommendStatus",
+        params: params
+    });
+}
+
+// 删除
+export function productDelStatus(params) {
+    return Service({
+        url: "/product/update/deleteStatus",
         params: params
     });
 }

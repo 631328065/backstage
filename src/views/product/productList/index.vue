@@ -7,36 +7,33 @@
       </div>
       <div class="search-content">
         <el-form ref="form" :model="form" label-width="140px">
-          <el-form-item label="输入搜索：" class="item">
-            <el-input v-model="form.name" placeholder="商品名称"></el-input>
+          <el-form-item label="输入搜索：" class="item" prop="keyword">
+            <el-input v-model="form.keyword" placeholder="商品名称"></el-input>
           </el-form-item>
-          <el-form-item label="商品货号：" class="item">
-            <el-input v-model="form.number" placeholder="商品货号"></el-input>
+          <el-form-item label="商品货号：" class="item" prop="productSn">
+            <el-input v-model="form.productSn" placeholder="商品货号"></el-input>
           </el-form-item>
-          <el-form-item label="商品分类：" class="item">
-            <el-cascader v-model="form.type" :options="typeOptions"></el-cascader>
+          <el-form-item label="商品分类：" class="item" prop="productCategoryId">
+            <el-cascader v-model="form.productCategoryId" clearable :options="catOptions" :props="{ label: 'name', value: 'id' }"></el-cascader>
           </el-form-item>
-          <el-form-item label="商品品牌：" class="item">
-            <el-select v-model="form.brand" placeholder="请选择品牌">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+          <el-form-item label="商品品牌：" class="item" prop="brandId">
+            <el-select v-model="form.brandId" clearable placeholder="请选择品牌">
+              <el-option v-for="item in brandList" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="上架状态：" class="item">
-            <el-select v-model="form.upState" placeholder="全部">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+          <el-form-item label="上架状态：" class="item" prop="publishStatus">
+            <el-select v-model="form.publishStatus" clearable placeholder="全部">
+              <el-option v-for="item in publishStatus" :key="item.status" :label="item.label" :value="item.status"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="审核状态：" class="item">
-            <el-select v-model="form.examine" placeholder="全部">
-              <el-option label="区域一" value="shanghai"></el-option>
-              <el-option label="区域二" value="beijing"></el-option>
+          <el-form-item label="审核状态：" clearable class="item" prop="verifyStatus">
+            <el-select v-model="form.verifyStatus" placeholder="全部">
+              <el-option v-for="item in verifyStatus" :key="item.status" :label="item.label" :value="item.status"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item class="formBtn">
-            <el-button size="small">重置</el-button>
-            <el-button size="small" type="primary">查询结果</el-button>
+            <el-button size="small" @click="reset">重置</el-button>
+            <el-button size="small" type="primary" @click="querySearch">查询结果</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -65,7 +62,7 @@
       </el-table-column>
       <el-table-column label="标签" align="center" width="140">
         <template v-slot="data">
-          <el-switch v-model="data.row.publishStatus" inactive-text="上架:" @change="publishStatus(data.row.id, data.row.publishStatus)" :active-value="1" :inactive-value="0"></el-switch>
+          <el-switch v-model="data.row.publishStatus" inactive-text="上架:" @change="productPubStatus(data.row.id, data.row.publishStatus)" :active-value="1" :inactive-value="0"></el-switch>
           <el-switch v-model="data.row.newStatus" inactive-text="新品:" @change="newStatus(data.row.id, data.row.publishStatus)" :active-value="1" :inactive-value="0"></el-switch>
           <el-switch v-model="data.row.recommandStatus" inactive-text="推荐:" @change="recommendStatus(data.row.id, data.row.publishStatus)" :active-value="1" :inactive-value="0"></el-switch>
         </template>
@@ -91,7 +88,7 @@
           </p>
           <p class="operation">
             <el-button size="mini">日志</el-button>
-            <el-button size="mini" type="danger">删除</el-button>
+            <el-button size="mini" type="danger" @click="delProduct(data.row.id)">删除</el-button>
           </p>
         </template>
       </el-table-column>
@@ -149,49 +146,63 @@
     </div>
 
     <div class="block">
-      <el-pagination background :page-sizes="[5, 10, 15]" :page-size="11" layout="total, sizes, prev, pager, next, jumper" :total="11"> </el-pagination>
+      <el-pagination background @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="form.pageNum" :page-sizes="[5, 10, 15]" :page-size="11" layout="total, sizes, prev, pager, next, jumper" :total="total"> </el-pagination>
     </div>
   </div>
 </template>
 
 <script>
-import { getProductList, productPublishStatus, productNewStatus, productRecommendStatus } from "@/api/product.js";
+import { getProductList, productPublishStatus, productNewStatus, productRecommendStatus, productDelStatus } from "@/api/product.js";
 import { querySku, editSku } from "@/api/productSku.js";
+import { getProductCat } from "@/api/productCat.js";
+import { getBrand } from "@/api/productBrand.js";
 export default {
   data() {
     return {
       form: {
-        name: "",
-        number: "",
-        type: "",
-        brand: "",
-        upState: "",
-        examine: "",
+        brandId: "",
+        keyword: "",
+        pageNum: 1,
+        pageSize: 5,
+        productCategoryId: "", //它是一个数组
+        productSn: "",
+        publishStatus: "",
+        verifyStatus: "",
       },
-      typeOptions: [
-        {
-          value: "zhinan",
-          label: "指南",
-          children: [
-            {
-              value: "cexiangdaohang",
-              label: "侧向导航",
-            },
-            {
-              value: "dingbudaohang",
-              label: "顶部导航",
-            },
-          ],
-        },
-      ],
+      catOptions: [],
       tableData: [],
       dialogVisible: false,
+
+      brandList: [],
+
+      publishStatus: [
+        {
+          label: "上架",
+          status: 1,
+        },
+        {
+          label: "下架",
+          status: 0,
+        },
+      ],
+
+      verifyStatus: [
+        {
+          label: "已审核",
+          status: 1,
+        },
+        {
+          label: "未审核",
+          status: 0,
+        },
+      ],
+
       skuData: [],
       productSn: "",
       pid: "",
       skuCode: "",
 
-      total: "",
+      total: 0,
 
       batch: "",
       batchArr: [
@@ -213,13 +224,39 @@ export default {
     },
   },
   mounted() {
-    getProductList().then((res) => {
-      this.tableData = res.data.list;
+    // 商品列表
+    this.querySearch();
+
+    //商品分类选择
+    getProductCat().then((res) => {
+      if (res.code == 200) {
+        this.catOptions = res.data;
+      }
+    });
+
+    //商品品牌选择
+    getBrand().then((res) => {
+      if (res.code == 200) {
+        this.brandList = res.data;
+      }
     });
   },
   methods: {
+    //搜索查询
+    querySearch() {
+      getProductList(this.form).then((res) => {
+        this.tableData = res.data.list;
+        this.total = res.data.total;
+      });
+    },
+
+    //查询字段重置
+    reset() {
+      this.$refs["form"].resetFields();
+    },
+
     // 上架
-    publishStatus(id, status) {
+    productPubStatus(id, status) {
       productPublishStatus({ ids: id, publishStatus: status }).then((res) => {
         if (res.code == 200) {
           this.$message({
@@ -252,6 +289,19 @@ export default {
       });
     },
 
+    //删除商品状态
+    delProduct(id) {
+      productDelStatus({ deleteStatus: 1, ids: id }).then((res) => {
+        if (res.code == 200) {
+          this.$message({
+            message: "删除成功",
+            type: "success",
+          });
+          this.querySearch();
+        }
+      });
+    },
+
     // sku编辑
     openSkuEdit(row) {
       querySku(row.id, { keyword: null }).then((res) => {
@@ -274,6 +324,16 @@ export default {
           this.skuCode = "";
         }
       });
+    },
+
+    //分页
+    handleSizeChange(val) {
+      this.form.pageSize = val;
+      this.querySearch();
+    },
+    handleCurrentChange(val) {
+      this.form.pageNum = val;
+      this.querySearch();
     },
   },
 };
