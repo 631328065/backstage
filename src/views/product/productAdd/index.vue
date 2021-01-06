@@ -21,6 +21,7 @@ import productInfo from "@/views/product/productAdd/components/productInfo.vue";
 import productSall from "@/views/product/productAdd/components/productSall.vue";
 import productAttr from "@/views/product/productAdd/components/productAttr.vue";
 import productRel from "@/views/product/productAdd/components/productRel.vue";
+import { productUpdateInfo } from "@/api/product.js";
 export default {
   data() {
     return {
@@ -74,7 +75,7 @@ export default {
             id: 0,
             productAttributeId: 0, //商品参数id
             productId: 0, //商品id
-            value: "string", //参数内容
+            value: "", //参数内容
           },
         ],
         productCategoryId: 0, //商品分类id
@@ -107,7 +108,7 @@ export default {
         publishStatus: 0, //上架状态：0->下架；1->上架
         recommandStatus: 0, //推荐状态；0->不推荐；1->推荐
         sale: 0, //销量
-        serviceIds: "string", //以逗号分割的产品服务：1->无忧退货；2->快速退款；3->免费包邮
+        serviceIds: [], //以逗号分割的产品服务：1->无忧退货；2->快速退款；3->免费包邮
         skuStockList: [
           {
             //商品的sku库存信息
@@ -148,6 +149,16 @@ export default {
       this.isShow[n] = true;
       this.isShow[o] = false;
     },
+  },
+  mounted() {
+    let pid = this.$route.query.pid;
+    if (pid) {
+      //根据id查询..说明是编辑页面
+      productUpdateInfo(pid).then((res) => {
+        this.product = res.data;
+        this.product.serviceIds = this.product.serviceIds.split(",");
+      });
+    }
   },
 };
 </script>

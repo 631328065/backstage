@@ -1,7 +1,13 @@
 <template>
   <div class="left-box">
-    <el-menu default-active="0" class="el-menu-vertical-demo" background-color="#294256" text-color="#a7cbd9" active-text-color="#3b9edf">
-      <el-menu-item index="0" @click="openHome">
+    <el-menu
+      default-active="0"
+      class="el-menu-vertical-demo"
+      background-color="#294256"
+      text-color="#a7cbd9"
+      active-text-color="#3b9edf"
+    >
+      <el-menu-item index="0">
         <i class="el-icon-s-home"></i>
         首页
       </el-menu-item>
@@ -13,7 +19,16 @@
               <span>{{ e.title }}</span>
             </template>
             <template v-for="(e2, i2) in e.children">
-              <el-menu-item :index="i2 + 1 + '-' + (i2 + 1)" class="menus-list" @click="openProduct(e2, i2)" :key="i2"> <i class="el-icon-s-order"></i> {{ e2.title }} </el-menu-item>
+              <template v-if="e2.meta.isMenuShow">
+                <el-menu-item
+                  :index="i2 + 1 + '-' + (i2 + 1)"
+                  class="menus-list"
+                  @click="openProduct(e2, i2)"
+                  :key="i2"
+                >
+                  <i class="el-icon-s-order"></i> {{ e2.title }}
+                </el-menu-item>
+              </template>
             </template>
           </el-submenu>
         </template>
@@ -31,28 +46,12 @@ export default {
     };
   },
   mounted() {
-    this.$store.state.title = this.$router.options.routes[0].title;
     this.routerData = this.$router.options.routes;
   },
   methods: {
-    openHome() {
-      this.$router.push("/home");
-    },
     openProduct(elem, index) {
-      if (index == 0) {
-        this.$router.push("/product/list");
-        this.$store.state.title = elem.title;
-      } else if (index == 1) {
-        this.$router.push("/product/add");
-        this.$store.state.title = elem.title;
-      } else if (index == 2) {
-        this.$router.push("/product/cat");
-        this.$store.state.title = elem.title;
-      } else if (index == 3) {
-        this.$router.push("/product/type");
-        this.$store.state.title = elem.title;
-      }
-      this.$store.state.menuIndex = index;
+      this.$router.push(elem.path);
+      this.$store.state.title = elem.title;
     },
   },
 };

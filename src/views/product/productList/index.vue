@@ -42,7 +42,7 @@
     <div class="dataList">
       <i class="el-icon-tickets"></i>
       <span>数据列表</span>
-      <el-button size="mini">添加</el-button>
+      <el-button size="mini" @click="toProductAdd">添加</el-button>
     </div>
 
     <el-table ref="multipleTable" :data="tableData" tooltip-effect="dark" style="width: 100%; margin-top: 20px" border>
@@ -84,7 +84,7 @@
         <template v-slot="data">
           <p class="operation">
             <el-button size="mini">查看</el-button>
-            <el-button size="mini">编辑</el-button>
+            <el-button size="mini" @click="toUpdateProduct(data.row.id)">编辑</el-button>
           </p>
           <p class="operation">
             <el-button size="mini">日志</el-button>
@@ -255,6 +255,11 @@ export default {
       this.$refs["form"].resetFields();
     },
 
+    //添加商品（跳转到添加商品）
+    toProductAdd() {
+      this.$router.push("/product/add");
+    },
+
     // 上架
     productPubStatus(id, status) {
       productPublishStatus({ ids: id, publishStatus: status }).then((res) => {
@@ -286,6 +291,14 @@ export default {
             type: "success",
           });
         }
+      });
+    },
+
+    //编辑商品跳转
+    toUpdateProduct(pid) {
+      this.$router.push({
+        path: "/product/add",
+        query: { pid: pid },
       });
     },
 

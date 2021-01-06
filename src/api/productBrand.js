@@ -6,3 +6,11 @@ export function getBrand() {
         url: "/brand/listAll"
     });
 }
+
+export function getbrandList(params) {
+    return Service({
+        method: "get",
+        url: "/brand/list",
+        params: params
+    });
+}

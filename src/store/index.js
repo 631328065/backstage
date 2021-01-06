@@ -4,9 +4,7 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-    state: {
-        title: '商品列表'
-    },
+    state: {},
     mutations: {},
     actions: {},
     modules: {}

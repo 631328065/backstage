@@ -31,30 +31,66 @@ const routes = [{
         component: layout,
         redirect: '/product/list',
         children: [{
-            path: '/product/list',
-            title: '商品列表',
-            name: 'productList',
-            component: () =>
-                import ('../views/product/productList/index.vue')
-        }, {
-            path: '/product/add',
-            title: '添加商品',
-            name: 'productAdd',
-            component: () =>
-                import ('../views/product/productAdd/index.vue')
-        }, {
-            path: '/product/cat',
-            title: '商品分类',
-            name: 'productCat',
-            component: () =>
-                import ('../views/product/productCat/index.vue')
-        }, {
-            path: '/product/type',
-            title: '商品类型',
-            name: 'productType',
-            component: () =>
-                import ('../views/product/productType/index.vue')
-        }]
+                path: '/product/list',
+                title: '商品列表',
+                name: 'productList',
+                meta: {
+                    isMenuShow: true,
+                },
+                component: () =>
+                    import ('../views/product/productList/index.vue')
+            },
+            {
+                path: '/product/add',
+                title: '添加商品',
+                name: 'productAdd',
+                meta: {
+                    isMenuShow: true,
+                },
+                component: () =>
+                    import ('../views/product/productAdd/index.vue')
+            },
+            {
+                path: '/product/cat',
+                title: '商品分类',
+                name: 'productCat',
+                meta: {
+                    isMenuShow: true,
+                },
+                component: () =>
+                    import ('../views/product/productCat/index.vue'),
+            },
+            {
+                path: '/product/cat/add',
+                title: '添加商品分类',
+                name: 'productCatAdd',
+                meta: {
+                    isMenuShow: false,
+                },
+                component: () =>
+                    import ('../views/product/productCat/components/addProductCat.vue'),
+            },
+            {
+                path: '/product/type',
+                title: '商品类型',
+                name: 'productType',
+                meta: {
+                    isMenuShow: true,
+                },
+                component: () =>
+                    import ('../views/product/productType/index.vue')
+            },
+            {
+                path: '/product/brand',
+                title: '品牌管理',
+                name: 'productBrand',
+                meta: {
+                    isMenuShow: true,
+                },
+                component: () =>
+                    import ('../views/product/productBrand/index.vue')
+            }
+        ]
     },
     {
         path: "/login",
